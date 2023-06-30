@@ -31,6 +31,10 @@ export default class Video extends Component {
     this._root.setNativeProps(nativeProps);
   }
 
+  setPictureInPicture(pictureInPictureValue){
+    this._root.setNativeProps({pictureInPicture:pictureInPictureValue});
+  }
+
   toTypeString(x) {
     switch (typeof x) {
       case 'object':

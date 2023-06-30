@@ -367,6 +367,7 @@ class ReactExoplayerView extends FrameLayout implements
             setPlayWhenReady(!isPaused);
         }
         isInBackground = false;
+        isInPictureInPictureMode = false;
     }
 
     @Override
