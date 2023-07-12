@@ -437,7 +437,6 @@ public class ReactExoplayerViewManager extends ViewGroupManager<ReactExoplayerVi
         }
         return ResizeMode.RESIZE_MODE_FIT;
     }
-
     /**
      * toStringMap converts a {@link ReadableMap} into a HashMap.
      *

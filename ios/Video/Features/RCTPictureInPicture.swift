@@ -4,16 +4,23 @@ import MediaAccessibility
 import React
 import Foundation
 
-#if TARGET_OS_IOS
+//#if TARGET_OS_IOS
 class RCTPictureInPicture: NSObject, AVPictureInPictureControllerDelegate {
     private var _onPictureInPictureStatusChanged: RCTDirectEventBlock?
     private var _onRestoreUserInterfaceForPictureInPictureStop: RCTDirectEventBlock?
     private var _restoreUserInterfaceForPIPStopCompletionHandler:((Bool) -> Void)? = nil
     private var _pipController:AVPictureInPictureController?
-    private var _isActive:Bool = false
+    var _isActive:Bool = false
     
     init(_ onPictureInPictureStatusChanged: @escaping RCTDirectEventBlock, _ onRestoreUserInterfaceForPictureInPictureStop: @escaping RCTDirectEventBlock) {
         _onPictureInPictureStatusChanged = onPictureInPictureStatusChanged
+        _onRestoreUserInterfaceForPictureInPictureStop = onRestoreUserInterfaceForPictureInPictureStop
+    }
+    
+    func set_onPictureInPictureStatusChanged(_ onPictureInPictureStatusChanged: @escaping RCTDirectEventBlock){
+        _onPictureInPictureStatusChanged = onPictureInPictureStatusChanged
+    }
+    func set_onRestoreUserInterfaceForPictureInPictureStop(_ onRestoreUserInterfaceForPictureInPictureStop: @escaping RCTDirectEventBlock) {
         _onRestoreUserInterfaceForPictureInPictureStop = onRestoreUserInterfaceForPictureInPictureStop
     }
     
@@ -24,8 +31,12 @@ class RCTPictureInPicture: NSObject, AVPictureInPictureControllerDelegate {
     }
     
     func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
-        guard let _onPictureInPictureStatusChanged = _onPictureInPictureStatusChanged else { return }
+        guard let _onPictureInPictureStatusChanged = _onPictureInPictureStatusChanged else {
+            return
         
+        }
+        _isActive = false
+        setRestoreUserInterfaceForPIPStopCompletionHandler(true)
         _onPictureInPictureStatusChanged([ "isActive": NSNumber(value: false)])
     }
     
@@ -47,29 +58,34 @@ class RCTPictureInPicture: NSObject, AVPictureInPictureControllerDelegate {
     }
     
     func setupPipController(_ playerLayer: AVPlayerLayer?) {
-        guard playerLayer != nil && AVPictureInPictureController.isPictureInPictureSupported() && _isActive else { return }
+        guard playerLayer != nil && AVPictureInPictureController.isPictureInPictureSupported() && !_isActive else {
+            return
+        }
         // Create new controller passing reference to the AVPlayerLayer
         _pipController = AVPictureInPictureController(playerLayer:playerLayer!)
         _pipController?.delegate = self
     }
     
-    func setPictureInPicture(_ isActive:Bool) {
+
+    public func setPictureInPicture(_ isActive:Bool) {
         if _isActive == isActive {
             return
         }
         _isActive = isActive
         
-        guard let _pipController = _pipController else { return }
+        guard let _pipController = _pipController else {
+            return
+        }
         
-        if _isActive && !_pipController.isPictureInPictureActive {
+        if _isActive  {
             DispatchQueue.main.async(execute: {
                 _pipController.startPictureInPicture()
             })
-        } else if !_isActive && _pipController.isPictureInPictureActive {
+        } else if !_isActive {
             DispatchQueue.main.async(execute: {
                 _pipController.stopPictureInPicture()
             })
         }
     }
 }
-#endif
+//#endif

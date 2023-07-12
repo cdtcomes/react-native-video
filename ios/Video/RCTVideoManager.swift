@@ -4,8 +4,13 @@ import React
 @objc(RCTVideoManager)
 class RCTVideoManager: RCTViewManager {
     
+    var video:RCTVideo?
+
+   // @objc var saludo:NSString?
+   
     override func view() -> UIView {
-        return RCTVideo(eventDispatcher: bridge.eventDispatcher() as! RCTEventDispatcher)
+        video = RCTVideo(eventDispatcher: bridge.eventDispatcher() as! RCTEventDispatcher)
+        return video!
     }
     
     func methodQueue() -> DispatchQueue {
@@ -35,7 +40,7 @@ class RCTVideoManager: RCTViewManager {
             }
         })
     }
-    
+
     @objc(setLicenseResultError:reactTag:)
     func setLicenseResultError(error: NSString, reactTag: NSNumber) -> Void {
         bridge.uiManager.prependUIBlock({_ , viewRegistry in
@@ -44,6 +49,18 @@ class RCTVideoManager: RCTViewManager {
                 RCTLogError("Invalid view returned from registry, expecting RCTVideo, got: %@", String(describing: view))
             } else if let view = view as? RCTVideo {
                 view.setLicenseResultError(error as String)
+            }
+        })
+    }
+    
+    @objc(setPictureInPictureIos:reactTag:)
+    func setPictureInPictureIos(pictureInPicture: Bool,reactTag: NSNumber){
+        bridge.uiManager.prependUIBlock({_ , viewRegistry in
+            let view = viewRegistry?[reactTag]
+            if !(view is RCTVideo) {
+                RCTLogError("Invalid view returned from registry, expecting RCTVideo, got: %@", String(describing: view))
+            } else if let view = view as? RCTVideo {
+                view.setPitureInPictureIos(true)
             }
         })
     }

@@ -79,10 +79,12 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
 #if canImport(RCTVideoCache)
     private let _videoCache:RCTVideoCachingHandler = RCTVideoCachingHandler()
 #endif
-
-#if TARGET_OS_IOS
-    private let _pip:RCTPictureInPicture = RCTPictureInPicture(self.onPictureInPictureStatusChanged, self.onRestoreUserInterfaceForPictureInPictureStop)
-#endif
+    private var _pip:RCTPictureInPicture?
+    
+    
+//#if TARGET_OS_IOS
+    
+//#endif
 
     // Events
     @objc var onVideoLoadStart: RCTDirectEventBlock?
@@ -104,10 +106,30 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     @objc var onPlaybackResume: RCTDirectEventBlock?
     @objc var onPlaybackRateChange: RCTDirectEventBlock?
     @objc var onVideoExternalPlaybackChange: RCTDirectEventBlock?
-    @objc var onPictureInPictureStatusChanged: RCTDirectEventBlock?
-    @objc var onRestoreUserInterfaceForPictureInPictureStop: RCTDirectEventBlock?
+    
+    func defaultEventValue(data: Optional<Dictionary<AnyHashable, Any>>){
+        
+    }
+    
+    var _onPictureInPictureStatusChanged: RCTDirectEventBlock? {
+        didSet  {
+            if _onPictureInPictureStatusChanged != nil && _onRestoreUserInterfaceForPictureInPictureStop != nil {
+                self.setupPictureInPicture()
+            }
+        }
+    }
+
+    var _onRestoreUserInterfaceForPictureInPictureStop: RCTDirectEventBlock? {
+            didSet  {
+                if _onPictureInPictureStatusChanged != nil && _onRestoreUserInterfaceForPictureInPictureStop != nil {
+                    self.setupPictureInPicture()
+                }
+            }
+    }
+    
     @objc var onGetLicense: RCTDirectEventBlock?
     @objc var onReceiveAdEvent: RCTDirectEventBlock?
+    
 
     init(eventDispatcher:RCTEventDispatcher!) {
         super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
@@ -148,6 +170,12 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
 #if canImport(RCTVideoCache)
         _videoCache.playerItemPrepareText = playerItemPrepareText
 #endif
+        /*
+        _onPictureInPictureStatusChanged = defaultEventValue
+        _onRestoreUserInterfaceForPictureInPictureStop = defaultEventValue(data:)
+        print("hello befere config")
+        self.setupPictureInPicture()
+         */
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -163,6 +191,10 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         _playerObserver.clearPlayer()
     }
 
+
+    func isPictureInPictureAvailable() -> Bool {
+        return AVPictureInPictureController.isPictureInPictureSupported()
+    }
     // MARK: - App lifecycle handlers
 
     @objc func applicationWillResignActive(notification:NSNotification!) {
@@ -201,6 +233,13 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     }
 
     // MARK: - Progress
+    
+    func setupPictureInPicture(){
+        if AVPictureInPictureController.isPictureInPictureSupported() && self._onPictureInPictureStatusChanged != nil && self._onRestoreUserInterfaceForPictureInPictureStop != nil {
+            _pip = RCTPictureInPicture(self._onPictureInPictureStatusChanged!, self._onRestoreUserInterfaceForPictureInPictureStop!)
+            //_pip?.setupPipController(_playerLayer)
+        }
+    }
 
     func sendProgressUpdate() {
         if let video = _player?.currentItem,
@@ -408,16 +447,40 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
 
     @objc
     func setPictureInPicture(_ pictureInPicture:Bool) {
-#if TARGET_OS_IOS
-        _pip.setPictureInPicture(pictureInPicture)
-#endif
+        /*
+        if AVPictureInPictureController.isPictureInPictureSupported() {
+            print("picture in picture", pictureInPicture)
+           // _pip?.setPictureInPicture(pictureInPicture)
+        }
+        else {
+           
+        }
+        //#if TARGET_OS_IOS
+            
+        //#endif
+         */
     }
+    
+    @objc
+    func setOnPictureInPictureStatusChanged(_ onPictureInPictureStatusChanged: @escaping RCTDirectEventBlock) {
+        _onPictureInPictureStatusChanged = onPictureInPictureStatusChanged
+    }
+    
+    @objc
+    func setOnRestoreUserInterfaceForPictureInPictureStop(_ onRestoreUserInterfaceForPictureInPictureStop: @escaping RCTDirectEventBlock) {
+        _onRestoreUserInterfaceForPictureInPictureStop = onRestoreUserInterfaceForPictureInPictureStop
+    }
+    
+    
 
     @objc
     func setRestoreUserInterfaceForPIPStopCompletionHandler(_ restore:Bool) {
-#if TARGET_OS_IOS
-        _pip.setRestoreUserInterfaceForPIPStopCompletionHandler(restore)
-#endif
+//#if TARGET_OS_IOS
+        if AVPictureInPictureController.isPictureInPictureSupported() {
+            _pip?.setRestoreUserInterfaceForPIPStopCompletionHandler(restore)
+        }
+       
+//#endif
     }
 
     @objc
@@ -679,6 +742,12 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             })
         }
     }
+    
+    func setPitureInPictureIos(_ pictureInPicture: Bool){
+        if AVPictureInPictureController.isPictureInPictureSupported() {
+            _pip!.setPictureInPicture(pictureInPicture)
+        }
+    }
 
     @objc
     func setFullscreenAutorotate(_ autorotate:Bool) {
@@ -743,9 +812,10 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
                 self.layer.addSublayer(_playerLayer)
             }
             self.layer.needsDisplayOnBoundsChange = true
-#if TARGET_OS_IOS
-            _pip.setupPipController(_playerLayer)
-#endif
+            if _pip != nil {
+                _pip?.setupPipController(_playerLayer)
+            }
+            
         }
     }
 

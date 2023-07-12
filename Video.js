@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, requireNativeComponent, NativeModules, UIManager, View, Image, Platform, findNodeHandle } from 'react-native';
+import { StyleSheet, requireNativeComponent, NativeModules, UIManager, View, Image, Platform, findNodeHandle, Alert } from 'react-native';
 import { ViewPropTypes, ImagePropTypes } from 'deprecated-react-native-prop-types';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 import TextTrackType from './TextTrackType';
@@ -32,7 +32,11 @@ export default class Video extends Component {
   }
 
   setPictureInPicture(pictureInPictureValue){
-    this._root.setNativeProps({pictureInPicture:pictureInPictureValue});
+    if(Platform.OS === "android"){
+      this._root.setNativeProps({pictureInPicture:pictureInPictureValue});
+    } else if (Platform.OS ==="ios") {
+      NativeModules.VideoManager.setPictureInPictureIos(true, findNodeHandle(this._root))
+    }
   }
 
   toTypeString(x) {

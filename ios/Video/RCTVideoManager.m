@@ -22,7 +22,7 @@ RCT_EXPORT_VIEW_PROPERTY(playInBackground, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(preventsDisplaySleepDuringVideoPlayback, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(preferredForwardBufferDuration, float);
 RCT_EXPORT_VIEW_PROPERTY(playWhenInactive, BOOL);
-RCT_EXPORT_VIEW_PROPERTY(pictureInPicture, BOOL);
+/* RCT_EXPORT_VIEW_PROPERTY(saludo, NSString); */
 RCT_EXPORT_VIEW_PROPERTY(ignoreSilentSwitch, NSString);
 RCT_EXPORT_VIEW_PROPERTY(mixWithOthers, NSString);
 RCT_EXPORT_VIEW_PROPERTY(rate, float);
@@ -59,6 +59,7 @@ RCT_EXPORT_VIEW_PROPERTY(onVideoExternalPlaybackChange, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onGetLicense, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onPictureInPictureStatusChanged, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onRestoreUserInterfaceForPictureInPictureStop, RCTDirectEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(pictureInPicture, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(onReceiveAdEvent, RCTDirectEventBlock);
 
 RCT_EXTERN_METHOD(save:(NSDictionary *)options
@@ -71,5 +72,8 @@ RCT_EXTERN_METHOD(setLicenseResult:(NSString *)license
 
 RCT_EXTERN_METHOD(setLicenseResultError(NSString *)error
                  reactTag:(nonnull NSNumber *)reactTag)
+
+RCT_EXTERN_METHOD(setPictureInPictureIos:(BOOL)pictureInPicture
+                  reactTag:(nonnull NSNumber *)reactTag)
 
 @end
