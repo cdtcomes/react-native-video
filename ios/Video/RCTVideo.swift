@@ -170,6 +170,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
 #if canImport(RCTVideoCache)
         _videoCache.playerItemPrepareText = playerItemPrepareText
 #endif
+        configureAudioSession()
         /*
         _onPictureInPictureStatusChanged = defaultEventValue
         _onRestoreUserInterfaceForPictureInPictureStop = defaultEventValue(data:)
@@ -1218,6 +1219,16 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
             _playerObserver.removePlayerTimeObserver()
         }
     }
+    
+    private func configureAudioSession() {
+            let audioSession = AVAudioSession.sharedInstance()
+            do {
+                try audioSession.setCategory(.playback, options: [.mixWithOthers])
+                try audioSession.setActive(true)
+            } catch {
+                print(error)
+            }
+        }
 
     //unused
     //    @objc func handleAVPlayerAccess(notification:NSNotification!) {

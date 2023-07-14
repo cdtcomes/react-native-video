@@ -78,6 +78,7 @@ class RCTPictureInPicture: NSObject, AVPictureInPictureControllerDelegate {
         }
         
         if _isActive  {
+           
             DispatchQueue.main.async(execute: {
                 _pipController.startPictureInPicture()
             })
