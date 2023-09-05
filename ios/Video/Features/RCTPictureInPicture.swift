@@ -11,10 +11,12 @@ class RCTPictureInPicture: NSObject, AVPictureInPictureControllerDelegate {
     private var _restoreUserInterfaceForPIPStopCompletionHandler:((Bool) -> Void)? = nil
     private var _pipController:AVPictureInPictureController?
     var _isActive:Bool = false
+    private var startPlayingVideo:()->Void
     
-    init(_ onPictureInPictureStatusChanged: @escaping RCTDirectEventBlock, _ onRestoreUserInterfaceForPictureInPictureStop: @escaping RCTDirectEventBlock) {
+    init(_ onPictureInPictureStatusChanged: @escaping RCTDirectEventBlock, _ onRestoreUserInterfaceForPictureInPictureStop: @escaping RCTDirectEventBlock, playVideo: @escaping ()-> Void) {
         _onPictureInPictureStatusChanged = onPictureInPictureStatusChanged
         _onRestoreUserInterfaceForPictureInPictureStop = onRestoreUserInterfaceForPictureInPictureStop
+        startPlayingVideo = playVideo
     }
     
     func set_onPictureInPictureStatusChanged(_ onPictureInPictureStatusChanged: @escaping RCTDirectEventBlock){
@@ -26,8 +28,9 @@ class RCTPictureInPicture: NSObject, AVPictureInPictureControllerDelegate {
     
     func pictureInPictureControllerDidStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
         guard let _onPictureInPictureStatusChanged = _onPictureInPictureStatusChanged else { return }
-        
         _onPictureInPictureStatusChanged([ "isActive": NSNumber(value: true)])
+        self.startPlayingVideo()
+        
     }
     
     func pictureInPictureControllerDidStopPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
