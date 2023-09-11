@@ -197,6 +197,12 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
         return AVPictureInPictureController.isPictureInPictureSupported()
     }
     // MARK: - App lifecycle handlers
+    
+    func play_video()->Void {
+        if _player != nil {
+            _player?.play()
+        }
+    }
 
     @objc func applicationWillResignActive(notification:NSNotification!) {
         if _playInBackground || _playWhenInactive || _paused {return}
@@ -237,7 +243,7 @@ class RCTVideo: UIView, RCTVideoPlayerViewControllerDelegate, RCTPlayerObserverH
     
     func setupPictureInPicture(){
         if AVPictureInPictureController.isPictureInPictureSupported() && self._onPictureInPictureStatusChanged != nil && self._onRestoreUserInterfaceForPictureInPictureStop != nil {
-            _pip = RCTPictureInPicture(self._onPictureInPictureStatusChanged!, self._onRestoreUserInterfaceForPictureInPictureStop!)
+            _pip = RCTPictureInPicture(self._onPictureInPictureStatusChanged!, self._onRestoreUserInterfaceForPictureInPictureStop!, playVideo: play_video)
             //_pip?.setupPipController(_playerLayer)
         }
     }
