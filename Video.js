@@ -38,6 +38,11 @@ export default class Video extends Component {
       NativeModules.VideoManager.setPictureInPictureIos(true, findNodeHandle(this._root))
     }
   }
+  playVideo(){
+    if (Platform.OS ==="ios") {
+      NativeModules.VideoManager.play_video(false,findNodeHandle(this._root))
+    }
+  }
 
   toTypeString(x) {
     switch (typeof x) {
@@ -382,6 +387,7 @@ export default class Video extends Component {
       onPictureInPictureStatusChanged: this._onPictureInPictureStatusChanged,
       onRestoreUserInterfaceForPictureInPictureStop: this._onRestoreUserInterfaceForPictureInPictureStop,
       onReceiveAdEvent: this._onReceiveAdEvent,
+      
     });
 
     const posterStyle = {

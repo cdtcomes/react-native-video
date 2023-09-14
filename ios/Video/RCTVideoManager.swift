@@ -65,6 +65,18 @@ class RCTVideoManager: RCTViewManager {
         })
     }
     
+    @objc(play_video:reactTag:)
+    func play_video(paused: Bool,reactTag: NSNumber){
+        bridge.uiManager.prependUIBlock({_ , viewRegistry in
+            let view = viewRegistry?[reactTag]
+            if !(view is RCTVideo) {
+                RCTLogError("Invalid view returned from registry, expecting RCTVideo, got: %@", String(describing: view))
+            } else if let view = view as? RCTVideo {
+                view.play_video()
+            }
+        })
+    }
+    
     
     override func constantsToExport() -> [AnyHashable : Any]? {
         return [

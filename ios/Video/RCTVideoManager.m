@@ -76,4 +76,7 @@ RCT_EXTERN_METHOD(setLicenseResultError(NSString *)error
 RCT_EXTERN_METHOD(setPictureInPictureIos:(BOOL)pictureInPicture
                   reactTag:(nonnull NSNumber *)reactTag)
 
+RCT_EXTERN_METHOD(play_video:(BOOL)paused
+                  reactTag:(nonnull NSNumber *)reactTag)
+
 @end
